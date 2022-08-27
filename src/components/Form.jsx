@@ -1,23 +1,32 @@
 import { useState } from "react"
+import emailjs from '@emailjs/browser';
+
+const serviceId = process.env.REACT_APP_SERVICE_ID
+const templateId = process.env.REACT_APP_TEMPLATE_ID
+const publicKey = process.env.REACT_APP_PUBLIC_KEY
 
 const Form = () => {
   const [userInfo, setUserInfo] = useState({})
 
-  const sendEmail = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    alert(`
-      name: ${userInfo.user_name}
-      last name: ${userInfo.user_lastName}
-      email: ${userInfo.user_mail}
-      Industry: ${userInfo.select}
-    `)
+    emailjs.send(serviceId, templateId,{
+      user_name: userInfo.user_name,
+      user_lastName: userInfo.user_lastName,
+      user_mail: userInfo.user_mail,
+      select: userInfo.select,
+      }, publicKey)
+      .then((result) => {
+        console.log(result.text);
+    }, (error) => {
+        console.log(error.text);
+    });
   }
 
   const handleChange = (evt) => {
     const { target } = evt
     const { name, value} = target
 
-    console.log(evt)
     setUserInfo({
       ...userInfo,
       [name]: value
@@ -51,7 +60,7 @@ const Form = () => {
           <option value="Industry3">Industry 3</option>
         </select>
       </div>
-      <button className="App-form-button" type="submit" onClick={sendEmail}>Get started</button>
+      <button className="App-form-button" type="submit" onClick={handleSubmit}>Get started</button>
     </form>
   )
 }
